@@ -1,0 +1,321 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #6366f1;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Table Wrapper - contains tabs and table */
+.table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* View Controls - now inside table wrapper */
+.controls {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.view-tabs {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: #fafafa;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tab:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.tab.active {
+  background: #6366f1;
+  color: white;
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+}
+
+/* Column Selector */
+.column-selector {
+  padding: 1.25rem 1.5rem;
+  background: #fafafa;
+  border-top: 1px solid #e2e8f0;
+}
+
+.column-selector h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.column-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.625rem;
+}
+
+.column-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  background: white;
+}
+
+.column-checkbox:hover {
+  background: #f8fafc;
+}
+
+.column-checkbox input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+.column-checkbox span {
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.handsontable-container {
+  width: 100%;
+  padding: 1rem;
+  max-height: calc(100vh - 280px);
+  overflow: auto;
+}
+
+/* Custom Scrollbar Styling */
+.handsontable-container::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.handsontable-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.handsontable-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
+
+.handsontable-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.handsontable-container::-webkit-scrollbar-corner {
+  background: #f1f5f9;
+}
+
+/* Firefox scrollbar styling */
+.handsontable-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Handsontable Custom Styles */
+.handsontable {
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+}
+
+.handsontable thead th {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  padding: 12px 8px !important;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.handsontable td {
+  border-color: #e2e8f0 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  padding: 10px 8px !important;
+  color: #1e293b;
+}
+
+.handsontable tbody tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+.handsontable tbody tr:hover td[style*="background-color: rgb(241, 245, 249)"] {
+  background-color: #e2e8f0 !important;
+}
+
+.handsontable .htCheckboxRendererInput {
+  accent-color: #6366f1;
+}
+
+.handsontable .ht__highlight {
+  background-color: #eef2ff !important;
+}
+
+.handsontable th.ht__highlight {
+  background: #e0e7ff !important;
+  font-weight: 600;
+}
+
+.handsontable th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+.handsontable .htAutocompleteArrow {
+  color: #94a3b8;
+}
+
+.handsontable .area {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+.handsontable .current {
+  box-shadow: 0 0 0 2px #6366f1 inset !important;
+}
+
+.htContextMenu {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.htContextMenu tbody tr:hover td {
+  background-color: #f1f5f9 !important;
+}
+
+.htDropdownMenu {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.htDatepickerHolder {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+  overflow: hidden;
+}
+
+.handsontable input {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 4px;
+}
+
+.handsontable input:focus {
+  border-color: #6366f1 !important;
+  outline: none;
+}
+
+.handsontable tbody tr:nth-child(even) td {
+  background-color: #fafafa;
+}
+
+.handsontable tbody tr:nth-child(even):hover td {
+  background-color: #f8fafc !important;
+}
+
+.htCenter {
+  text-align: center !important;
+}
+
+.htRight {
+  text-align: right !important;
+}
+
+.htLeft {
+  text-align: left !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .view-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab {
+    justify-content: center;
+  }
+
+  .column-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .handsontable-container {
+    max-height: calc(100vh - 320px);
+  }
+}
