@@ -123,7 +123,6 @@ const App = () => {
         newData[index].rate = calculateRate(value);
       }
 
-      // Also update Handsontable if it exists
       if (hotTableRef.current) {
         hotTableRef.current.setDataAtRowProp(index, field, value);
         if (field === "est") {
@@ -137,6 +136,59 @@ const App = () => {
 
       return newData;
     });
+  };
+
+  const exportToCSV = () => {
+    let columnsToExport;
+
+    if (activeView === "morning") {
+      columnsToExport = morningColumns;
+    } else if (activeView === "evening") {
+      columnsToExport = [
+        "task",
+        "est",
+        ...eveningColumns.filter((col) => col !== "taskReference"),
+      ];
+    } else if (activeView === "custom") {
+      columnsToExport = allColumnKeys.filter((key) => customColumns[key]);
+    } else {
+      columnsToExport = allColumnKeys;
+    }
+
+    const headers = columnsToExport.map((key) => columnLabels[key]);
+    const csvContent = [
+      headers.join(","),
+      ...taskData.map((row) =>
+        columnsToExport
+          .map((key) => {
+            let value = row[key] || "";
+            if (
+              typeof value === "string" &&
+              (value.includes(",") ||
+                value.includes('"') ||
+                value.includes("\n"))
+            ) {
+              value = `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    const viewName = activeView.charAt(0).toUpperCase() + activeView.slice(1);
+    const timestamp = new Date().toISOString().split("T")[0];
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", `tasks_${viewName}_${timestamp}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const timeRenderer = (
@@ -449,7 +501,6 @@ const App = () => {
             }
           });
 
-          // Sync with state
           setTaskData(hot.getSourceData());
 
           if (activeView === "evening") {
@@ -775,10 +826,8 @@ const App = () => {
   return (
     <div className="app-container">
       <div className="header">
-        <h1>Task Management Table</h1>
-        <p className="subtitle">
-          Track and manage your project tasks efficiently
-        </p>
+        <h1>Job Diary</h1>
+        <p className="subtitle">Track and manage your Jobs efficiently</p>
       </div>
 
       <div className="table-wrapper">
@@ -814,6 +863,14 @@ const App = () => {
             >
               <span className="tab-icon">⚙️</span>
               Custom View
+            </button>
+            <button
+              className="export-button"
+              onClick={exportToCSV}
+              title="Export current view to CSV"
+            >
+              <span className="export-icon">📥</span>
+              Export
             </button>
           </div>
 
