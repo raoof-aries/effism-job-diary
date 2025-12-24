@@ -39,7 +39,7 @@ const App = () => {
     "rate",
   ];
   const eveningColumns = [
-    "taskReference", // New reference column
+    "taskReference",
     "act",
     "target",
     "outcome",
@@ -49,7 +49,12 @@ const App = () => {
   ];
   const allColumnKeys = [
     ...morningColumns,
-    ...eveningColumns.filter((col) => col !== "taskReference"),
+    "act",
+    "target",
+    "outcome",
+    "cfDate",
+    "totalEst",
+    "status",
   ];
 
   const columnLabels = {
@@ -61,7 +66,7 @@ const App = () => {
     client: "Client",
     est: "Est",
     rate: "Rate",
-    taskReference: "Task & Est",
+    taskReference: "Task Info",
     act: "Act",
     target: "Target",
     outcome: "Outcome of the Task",
@@ -146,7 +151,6 @@ const App = () => {
     return td;
   };
 
-  // Custom renderer for task reference in evening view
   const taskReferenceRenderer = (
     instance,
     td,
@@ -161,35 +165,48 @@ const App = () => {
 
     td.innerHTML = "";
     td.style.backgroundColor = "#fafafa";
-    td.style.padding = "10px 8px";
-    td.style.verticalAlign = "top";
+    td.style.padding = "10px 12px";
+    td.style.verticalAlign = "middle";
     td.style.cursor = "default";
+    td.style.borderLeft = "3px solid #e2e8f0";
 
     if (taskValue || estValue) {
       const taskDiv = document.createElement("div");
-      taskDiv.style.color = "#475569";
+      taskDiv.style.color = "#334155";
       taskDiv.style.fontSize = "13px";
       taskDiv.style.fontWeight = "500";
-      taskDiv.style.marginBottom = "4px";
+      taskDiv.style.marginBottom = "6px";
       taskDiv.style.lineHeight = "1.4";
       taskDiv.textContent = taskValue || "—";
 
       const estDiv = document.createElement("div");
-      estDiv.style.color = "#dc2626";
-      estDiv.style.fontSize = "12px";
-      estDiv.style.fontWeight = "600";
       estDiv.style.display = "flex";
       estDiv.style.alignItems = "center";
-      estDiv.style.gap = "4px";
-      estDiv.innerHTML = `<span style="color: #94a3b8;">Est:</span> ${
-        estValue || "—"
-      }`;
+      estDiv.style.gap = "6px";
+      estDiv.style.fontSize = "12px";
+
+      const label = document.createElement("span");
+      label.style.color = "#94a3b8";
+      label.style.fontWeight = "500";
+      label.textContent = "Est:";
+
+      const time = document.createElement("span");
+      time.style.color = "#dc2626";
+      time.style.fontWeight = "600";
+      time.textContent = estValue || "—";
+
+      estDiv.appendChild(label);
+      estDiv.appendChild(time);
 
       td.appendChild(taskDiv);
       td.appendChild(estDiv);
     } else {
-      td.textContent = "—";
-      td.style.color = "#cbd5e1";
+      const emptyDiv = document.createElement("div");
+      emptyDiv.style.color = "#cbd5e1";
+      emptyDiv.style.fontSize = "12px";
+      emptyDiv.style.fontStyle = "italic";
+      emptyDiv.textContent = "No task";
+      td.appendChild(emptyDiv);
     }
 
     return td;
@@ -266,6 +283,7 @@ const App = () => {
         readOnly: true,
         renderer: taskReferenceRenderer,
         className: "task-reference-cell",
+        width: 200,
       },
       act: {
         data: "act",
@@ -392,7 +410,6 @@ const App = () => {
             }
           });
 
-          // Refresh task reference column if in evening view
           if (activeView === "evening") {
             hot.render();
           }
