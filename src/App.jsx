@@ -25,6 +25,8 @@ const App = () => {
     status: true,
   });
   const [showColumnSelector, setShowColumnSelector] = useState(false);
+  const [expandedCards, setExpandedCards] = useState(new Set());
+  const [taskData, setTaskData] = useState(initialData);
 
   const HOURLY_RATE = 500;
 
@@ -98,6 +100,43 @@ const App = () => {
   const calculateRate = (estTime) => {
     const hours = timeToHours(estTime);
     return hours * HOURLY_RATE;
+  };
+
+  const toggleCard = (index) => {
+    setExpandedCards((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  const handleFieldChange = (index, field, value) => {
+    setTaskData((prevData) => {
+      const newData = [...prevData];
+      newData[index] = { ...newData[index], [field]: value };
+
+      if (field === "est") {
+        newData[index].rate = calculateRate(value);
+      }
+
+      // Also update Handsontable if it exists
+      if (hotTableRef.current) {
+        hotTableRef.current.setDataAtRowProp(index, field, value);
+        if (field === "est") {
+          hotTableRef.current.setDataAtRowProp(
+            index,
+            "rate",
+            newData[index].rate
+          );
+        }
+      }
+
+      return newData;
+    });
   };
 
   const timeRenderer = (
@@ -367,7 +406,7 @@ const App = () => {
       const { headers, columns } = getVisibleColumns();
 
       const hot = new Handsontable(containerRef.current, {
-        data: initialData,
+        data: taskData,
         colHeaders: headers,
         columns: columns,
         rowHeaders: true,
@@ -410,6 +449,9 @@ const App = () => {
             }
           });
 
+          // Sync with state
+          setTaskData(hot.getSourceData());
+
           if (activeView === "evening") {
             hot.render();
           }
@@ -441,6 +483,293 @@ const App = () => {
       ...prev,
       [key]: !prev[key],
     }));
+  };
+
+  const MobileAccordion = () => {
+    return (
+      <div className="mobile-accordion">
+        {taskData.map((row, index) => {
+          const isExpanded = expandedCards.has(index);
+          const statusValue = row.status || "0";
+          const statusColor =
+            parseInt(statusValue) >= 75
+              ? "#10b981"
+              : parseInt(statusValue) >= 50
+              ? "#f59e0b"
+              : "#ef4444";
+
+          return (
+            <div key={index} className="accordion-card">
+              <div className="card-header" onClick={() => toggleCard(index)}>
+                <div className="card-header-main">
+                  <div className="card-title">
+                    {row.task || "Untitled Task"}
+                  </div>
+                  <div className="card-meta">
+                    <span className="meta-item">
+                      <span className="meta-label">Est:</span>
+                      <span className="meta-value time">{row.est || "—"}</span>
+                    </span>
+                    <span className="meta-item">
+                      <span className="meta-label">Act:</span>
+                      <span className="meta-value time">{row.act || "—"}</span>
+                    </span>
+                    <span
+                      className="meta-item status-badge"
+                      style={{ backgroundColor: statusColor }}
+                    >
+                      {statusValue}%
+                    </span>
+                  </div>
+                </div>
+                <button className="expand-button">
+                  {isExpanded ? "−" : "+"}
+                </button>
+              </div>
+
+              {isExpanded && (
+                <div className="card-body">
+                  <div className="field-group">
+                    <label>Task</label>
+                    <input
+                      type="text"
+                      value={row.task || ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "task", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="field-row">
+                    <div className="field-group">
+                      <label>Main Type</label>
+                      <select
+                        value={row.mainType || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "mainType", e.target.value)
+                        }
+                      >
+                        <option value="">Select...</option>
+                        <option>Invoceable</option>
+                        <option>Non Invoiceable</option>
+                        <option>Personal Jobs</option>
+                        <option>Marketing & Branding</option>
+                      </select>
+                    </div>
+
+                    <div className="field-group">
+                      <label>SubType</label>
+                      <select
+                        value={row.subType || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "subType", e.target.value)
+                        }
+                      >
+                        <option value="">Select...</option>
+                        <option>Corrective action</option>
+                        <option>Idea</option>
+                        <option>Monthly management meeting</option>
+                        <option>Preventive action</option>
+                        <option>Training attended</option>
+                        <option>Training Provided</option>
+                        <option>Cash Collection</option>
+                        <option>Client Calls</option>
+                        <option>Client Emails</option>
+                        <option>Client Meetings</option>
+                        <option>Cost Controll</option>
+                        <option>Inter Division Contribution</option>
+                        <option>Client Complaint</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="field-row">
+                    <div className="field-group checkbox-field">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={row.unplan || false}
+                          onChange={(e) =>
+                            handleFieldChange(index, "unplan", e.target.checked)
+                          }
+                        />
+                        <span>Unplanned</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="field-group">
+                    <label>Job No.</label>
+                    <select
+                      value={row.jobNo || ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "jobNo", e.target.value)
+                      }
+                    >
+                      <option value="">Select...</option>
+                      <option>Effism/2020/ESOL/Oper</option>
+                      <option>Effism/2020/ESOL/EFFISM</option>
+                      <option>Effism/2020/ESOL/IBC</option>
+                      <option>AES/JN/2024/HYDRAULICS</option>
+                      <option>AES/IN/2022/BIZEVENTS</option>
+                      <option>ESOL/AIMRI/LMS1.0/24</option>
+                      <option>ESOL/AMR/WEBS/24</option>
+                      <option>AES/JN/2024/EIT</option>
+                      <option>ESOL/AIMRIIN/WEBS/25</option>
+                      <option>ESOL/ONE/AM/WBS/25</option>
+                      <option>ESOL/AIMRI/EFSM 2.0/23</option>
+                      <option>AES/JN/2024/YACHTEK</option>
+                      <option>AES/JN/2022/AIMRIIND</option>
+                    </select>
+                  </div>
+
+                  <div className="field-group">
+                    <label>Client</label>
+                    <input
+                      type="text"
+                      value={row.client || ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "client", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="field-row">
+                    <div className="field-group">
+                      <label>Est Time</label>
+                      <select
+                        value={row.est || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "est", e.target.value)
+                        }
+                      >
+                        <option value="">Select...</option>
+                        {timeOptions.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="field-group">
+                      <label>Rate</label>
+                      <input
+                        type="text"
+                        value={row.rate ? `₹${row.rate}` : "—"}
+                        disabled
+                        className="rate-field"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="field-row">
+                    <div className="field-group">
+                      <label>Act Time</label>
+                      <select
+                        value={row.act || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "act", e.target.value)
+                        }
+                      >
+                        <option value="">Select...</option>
+                        {timeOptions.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="field-group">
+                      <label>Status %</label>
+                      <select
+                        value={row.status || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "status", e.target.value)
+                        }
+                      >
+                        <option value="">Select...</option>
+                        {[
+                          "100",
+                          "95",
+                          "90",
+                          "85",
+                          "80",
+                          "75",
+                          "70",
+                          "65",
+                          "60",
+                          "55",
+                          "50",
+                          "45",
+                        ].map((s) => (
+                          <option key={s} value={s}>
+                            {s}%
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="field-row">
+                    <div className="field-group">
+                      <label>Target Date</label>
+                      <input
+                        type="date"
+                        value={row.target || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "target", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="field-group">
+                      <label>CF Date</label>
+                      <input
+                        type="date"
+                        value={row.cfDate || ""}
+                        onChange={(e) =>
+                          handleFieldChange(index, "cfDate", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="field-group">
+                    <label>Total Est</label>
+                    <select
+                      value={row.totalEst || ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "totalEst", e.target.value)
+                      }
+                    >
+                      <option value="">Select...</option>
+                      {timeOptions.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="field-group">
+                    <label>Outcome</label>
+                    <textarea
+                      value={row.outcome || ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "outcome", e.target.value)
+                      }
+                      rows="3"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -507,7 +836,13 @@ const App = () => {
           )}
         </div>
 
-        <div ref={containerRef} className="handsontable-container"></div>
+        <div
+          ref={containerRef}
+          className="handsontable-container desktop-only"
+        ></div>
+        <div className="mobile-only">
+          <MobileAccordion />
+        </div>
       </div>
     </div>
   );

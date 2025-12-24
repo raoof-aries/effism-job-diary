@@ -79,6 +79,12 @@ body {
   border-bottom: 1px solid #e2e8f0;
 }
 
+@media (max-width: 768px) {
+  .controls {
+    display: none;
+  }
+}
+
 .view-tabs {
   display: flex;
   gap: 0;
@@ -348,6 +354,230 @@ body {
   text-align: left !important;
 }
 
+/* Mobile/Desktop Toggle */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
+/* Mobile Accordion Styles */
+.mobile-accordion {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.accordion-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.accordion-card:active {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  background: #fafafa;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 0.75rem;
+}
+
+.card-header-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.625rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.meta-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.meta-value {
+  color: #334155;
+  font-weight: 600;
+}
+
+.meta-value.time {
+  color: #dc2626;
+}
+
+.status-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.expand-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expand-button:active {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.card-body {
+  padding: 1rem;
+  background: white;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-group {
+  margin-bottom: 1rem;
+}
+
+.field-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-group input[type="text"],
+.field-group input[type="date"],
+.field-group select,
+.field-group textarea {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #1e293b;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.field-group input[type="text"]:focus,
+.field-group input[type="date"]:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.field-group.checkbox-field {
+  margin-bottom: 1rem;
+}
+
+.field-group.checkbox-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.field-group.checkbox-field input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+.field-group.checkbox-field span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.rate-field {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .app-container {
@@ -368,6 +598,14 @@ body {
   }
 
   .column-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrapper {
+    border-radius: 8px;
+  }
+
+  .field-row {
     grid-template-columns: 1fr;
   }
 }
