@@ -7,7 +7,7 @@ import initialData from "./data.json";
 const App = () => {
   const hotTableRef = useRef(null);
   const containerRef = useRef(null);
-  const [activeView, setActiveView] = useState("morning"); // Changed default to morning
+  const [activeView, setActiveView] = useState("morning");
   const [customColumns, setCustomColumns] = useState({
     task: true,
     mainType: true,
@@ -28,7 +28,6 @@ const App = () => {
 
   const HOURLY_RATE = 500;
 
-  // Column definitions
   const morningColumns = [
     "task",
     "mainType",
@@ -40,6 +39,7 @@ const App = () => {
     "rate",
   ];
   const eveningColumns = [
+    "taskReference", // New reference column
     "act",
     "target",
     "outcome",
@@ -47,7 +47,10 @@ const App = () => {
     "totalEst",
     "status",
   ];
-  const allColumnKeys = [...morningColumns, ...eveningColumns];
+  const allColumnKeys = [
+    ...morningColumns,
+    ...eveningColumns.filter((col) => col !== "taskReference"),
+  ];
 
   const columnLabels = {
     task: "Task",
@@ -58,6 +61,7 @@ const App = () => {
     client: "Client",
     est: "Est",
     rate: "Rate",
+    taskReference: "Task & Est",
     act: "Act",
     target: "Target",
     outcome: "Outcome of the Task",
@@ -142,6 +146,55 @@ const App = () => {
     return td;
   };
 
+  // Custom renderer for task reference in evening view
+  const taskReferenceRenderer = (
+    instance,
+    td,
+    row,
+    col,
+    prop,
+    value,
+    cellProperties
+  ) => {
+    const taskValue = instance.getDataAtRowProp(row, "task");
+    const estValue = instance.getDataAtRowProp(row, "est");
+
+    td.innerHTML = "";
+    td.style.backgroundColor = "#fafafa";
+    td.style.padding = "10px 8px";
+    td.style.verticalAlign = "top";
+    td.style.cursor = "default";
+
+    if (taskValue || estValue) {
+      const taskDiv = document.createElement("div");
+      taskDiv.style.color = "#475569";
+      taskDiv.style.fontSize = "13px";
+      taskDiv.style.fontWeight = "500";
+      taskDiv.style.marginBottom = "4px";
+      taskDiv.style.lineHeight = "1.4";
+      taskDiv.textContent = taskValue || "—";
+
+      const estDiv = document.createElement("div");
+      estDiv.style.color = "#dc2626";
+      estDiv.style.fontSize = "12px";
+      estDiv.style.fontWeight = "600";
+      estDiv.style.display = "flex";
+      estDiv.style.alignItems = "center";
+      estDiv.style.gap = "4px";
+      estDiv.innerHTML = `<span style="color: #94a3b8;">Est:</span> ${
+        estValue || "—"
+      }`;
+
+      td.appendChild(taskDiv);
+      td.appendChild(estDiv);
+    } else {
+      td.textContent = "—";
+      td.style.color = "#cbd5e1";
+    }
+
+    return td;
+  };
+
   const getColumnConfig = (key) => {
     const configs = {
       task: { data: "task", type: "text" },
@@ -206,6 +259,13 @@ const App = () => {
         type: "numeric",
         readOnly: true,
         renderer: rateRenderer,
+      },
+      taskReference: {
+        data: "task",
+        type: "text",
+        readOnly: true,
+        renderer: taskReferenceRenderer,
+        className: "task-reference-cell",
       },
       act: {
         data: "act",
@@ -331,6 +391,11 @@ const App = () => {
               hot.setDataAtRowProp(row, "rate", rate, "auto-calculation");
             }
           });
+
+          // Refresh task reference column if in evening view
+          if (activeView === "evening") {
+            hot.render();
+          }
         },
       });
 
